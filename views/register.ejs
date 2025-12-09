@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Create your CareShift AI account</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-card">
+      <% if (error) { %>
+        <div class="error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/register">
+        <h2>Account details</h2>
+
+        <label>
+          Full Name
+          <input type="text" name="name" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" name="password" required minlength="6" />
+        </label>
+
+        <label>
+          Role
+          <select name="role" required>
+            <option value="">Select your role</option>
+            <option value="manager" <%= presetRole === 'manager' ? 'selected' : '' %>>Manager</option>
+            <option value="staff" <%= presetRole === 'staff' ? 'selected' : '' %>>Support worker / care staff</option>
+            <option value="nurse" <%= presetRole === 'nurse' ? 'selected' : '' %>>Nurse</option>
+          </select>
+        </label>
+
+        <hr />
+
+        <h2>Provider details (for managers)</h2>
+        <p class="note">
+          If you are a <strong>manager</strong>, please fill in these details about your care home or agency.
+          If you are a worker, you can leave these blank.
+        </p>
+
+        <label>
+          Provider name (care home / agency)
+          <input type="text" name="provider_name" />
+        </label>
+
+        <label>
+          Service type
+          <input type="text" name="provider_service_type" placeholder="e.g. Nursing home, Domiciliary care" />
+        </label>
+
+        <label>
+          Locations / sites
+          <input type="text" name="provider_locations" placeholder="e.g. London, Essex" />
+        </label>
+
+        <label>
+          Roles &amp; skill mix
+          <textarea name="provider_roles_skill_mix" rows="3"
+            placeholder="e.g. Nurses, senior carers, support workers"></textarea>
+        </label>
+
+        <button type="submit" class="button">Create Account</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

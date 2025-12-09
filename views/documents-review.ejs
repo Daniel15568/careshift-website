@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Documents Review - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Documents Review</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/open-shifts/manage">Open shifts</a>
+      <a href="/rota-week">Weekly rota</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (Manager)</h2>
+      <p>Review worker documents and mark them as verified or rejected.</p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <section>
+      <% if (docs.length === 0) { %>
+        <p>No documents uploaded yet.</p>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Worker</th>
+              <th>Type</th>
+              <th>File</th>
+              <th>Status</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% docs.forEach(d => { %>
+              <tr>
+                <td>
+                  <%= d.user_name %> (<%= d.user_role %>)<br />
+                  <small><%= d.user_email %></small>
+                </td>
+                <td><%= d.doc_type %></td>
+                <td>
+                  <a href="<%= d.file_path %>" target="_blank">
+                    <%= d.original_name %>
+                  </a>
+                </td>
+                <td>
+                  <span class="status-pill status-<%= d.status %>">
+                    <%= d.status %>
+                  </span>
+                </td>
+                <td><%= d.uploaded_at %></td>
+                <td>
+                  <form method="POST" action="/documents-review/verify" class="inline-form">
+                    <input type="hidden" name="document_id" value="<%= d.id %>" />
+                    <button type="submit" class="small-button">Verify</button>
+                  </form>
+                  <form method="POST" action="/documents-review/reject" class="inline-form">
+                    <input type="hidden" name="document_id" value="<%= d.id %>" />
+                    <button type="submit" class="danger-button small-button">Reject</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

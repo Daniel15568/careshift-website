@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weekly Rota - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+    <header>
+    <div class="page-header">
+      <h1>Weekly Rota</h1>
+      <span class="ai-pill">⚡ AI suggestions coming soon</span>
+    </div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/assign-shift">Assign shift</a>
+      <a href="/manager-shifts">All shifts I assigned</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (Manager)</h2>
+      <p>
+        Showing rota for week:
+        <strong><%= startDateStr %></strong> to <strong><%= endDateStr %></strong>
+      </p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <section class="form-card">
+      <h3>Go to a different week</h3>
+      <form method="GET" action="/rota-week" class="filters-form">
+        <label>
+          Week starting (Monday)
+          <input type="date" name="week_start" value="<%= startDateStr %>" />
+        </label>
+        <button type="submit" class="button secondary">Go</button>
+      </form>
+    </section>
+
+    <section>
+      <% if (shifts.length === 0) { %>
+        <p>No shifts assigned for this week yet.</p>
+      <% } else { %>
+        <% days.forEach(day => { %>
+          <div class="rota-day">
+            <h3><%= day.label %></h3>
+
+            <% const dayShifts = shifts.filter(s => s.date === day.date); %>
+
+            <% if (dayShifts.length === 0) { %>
+              <p class="note">No shifts assigned for this day.</p>
+            <% } else { %>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Worker</th>
+                    <th>Role</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% dayShifts.forEach(s => { %>
+                    <tr>
+                      <td><%= s.start_time %> - <%= s.end_time %></td>
+                      <td><%= s.worker_name %> (<%= s.worker_role %>)</td>
+                      <td><%= s.role || '-' %></td>
+                      <td><%= s.location || '-' %></td>
+                      <td>
+                        <span class="status-pill status-<%= s.status %>">
+                          <%= s.status %>
+                        </span>
+                      </td>
+                      <td><%= s.notes || '-' %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            <% } %>
+          </div>
+        <% }) %>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

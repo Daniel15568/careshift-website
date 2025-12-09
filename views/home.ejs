@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CareShift AI – Smarter rota planning</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="home">
+  <header>
+    <div class="top-bar">
+      <div class="brand">
+        <div class="logo-mark">CS</div>
+        <div class="brand-text">
+          <div class="brand-name">CareShift AI</div>
+          <div class="brand-tagline">Safe staffing, less stress</div>
+        </div>
+      </div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/register?role=manager">New care provider</a>
+        <a href="/login?role=manager">Existing manager</a>
+        <a href="/login?role=worker">Worker (staff / nurse)</a>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="pill">Early prototype • Demo only</div>
+          <h1>Smarter rota planning and shift management for care providers</h1>
+          <p class="hero-subtitle">
+            Plan safe staffing levels, fill open shifts fast and keep worker compliance
+            in one simple workspace.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button" href="/register?role=manager">Create a provider account</a>
+            <a class="button ghost" href="/login?role=worker">I’m a worker</a>
+          </div>
+
+          <div class="hero-logos">
+            <span class="mini-logo">
+              <span class="mini-icon">🏥</span>
+              <span class="mini-text">Care homes</span>
+            </span>
+            <span class="mini-logo">
+              <span class="mini-icon">🏡</span>
+              <span class="mini-text">Supported living</span>
+            </span>
+            <span class="mini-logo">
+              <span class="mini-icon">🧑‍⚕️</span>
+              <span class="mini-text">Agency staff</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="hero-card">
+            <h2>Live demo sandbox</h2>
+            <p>
+              Use this demo app to simulate how managers and workers would use CareShift AI
+              in a real service.
+            </p>
+            <ul>
+              <li>Managers assign shifts and post open shifts</li>
+              <li>Workers claim extra work and upload documents</li>
+              <li>Compliance visible in one place</li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-grid">
+      <div class="feature-card">
+        <h3>For managers</h3>
+        <p>
+          Set up your provider, assign shifts, review documents and approve open-shift
+          requests from your team.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3>For workers</h3>
+        <p>
+          View your rota, mark shifts completed or cancelled, claim extra shifts and keep
+          your DBS &amp; RTW up to date.
+        </p>
+      </div>
+      <div class="feature-card">
+        <h3>Coming next</h3>
+        <p>
+          Auto safe-staffing checks, a weekly rota builder, and smarter matching between
+          open shifts and workers.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <%= new Date().getFullYear() %> CareShift AI</p>
+  </footer>
+</body>
+</html>

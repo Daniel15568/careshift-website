@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Open Shifts - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Manage Open Shifts</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/rota-week">Weekly rota</a>
+      <a href="/documents-review">Documents review</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (Manager)</h2>
+      <p>Create open shifts here so workers can find extra work.</p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <section class="form-card">
+      <h3>Create a new open shift</h3>
+      <form method="POST" action="/open-shifts/manage">
+        <label>
+          Date
+          <input type="date" name="date" required />
+        </label>
+
+        <label>
+          Start time
+          <input type="time" name="start_time" required />
+        </label>
+
+        <label>
+          End time
+          <input type="time" name="end_time" required />
+        </label>
+
+        <label>
+          Location / unit
+          <input type="text" name="location" />
+        </label>
+
+        <label>
+          Role
+          <input type="text" name="role" placeholder="e.g. Nurse, Support worker" />
+        </label>
+
+        <label>
+          Notes
+          <textarea name="notes" rows="3" placeholder="Any extra info for workers"></textarea>
+        </label>
+
+        <button type="submit" class="button">Create open shift</button>
+      </form>
+    </section>
+
+    <section>
+      <h3>Existing open shifts</h3>
+      <% if (openShifts.length === 0) { %>
+        <p>No open shifts created yet.</p>
+      <% } else { %>
+                <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Worker (if requested/approved)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          </thead>
+                    <tbody>
+            <% openShifts.forEach(s => { %>
+              <tr>
+                <td><%= s.date %></td>
+                <td><%= s.start_time %> - <%= s.end_time %></td>
+                <td><%= s.location || '-' %></td>
+                <td><%= s.role || '-' %></td>
+                <td>
+                  <span class="status-pill status-<%= s.status %>">
+                    <%= s.status %>
+                  </span>
+                </td>
+                <td><%= s.assigned_worker_name || '-' %></td>
+                <td>
+                  <% if (s.status === 'requested') { %>
+                    <form method="POST" action="/open-shifts/approve" class="inline-form">
+                      <input type="hidden" name="open_shift_id" value="<%= s.id %>" />
+                      <button type="submit" class="small-button">Approve</button>
+                    </form>
+                    <form method="POST" action="/open-shifts/reject" class="inline-form">
+                      <input type="hidden" name="open_shift_id" value="<%= s.id %>" />
+                      <button type="submit" class="danger-button small-button">Reject</button>
+                    </form>
+                  <% } else { %>
+                    <span class="note">No actions</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

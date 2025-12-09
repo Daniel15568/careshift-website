@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile &amp; Documents - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Profile &amp; Documents</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/my-shifts">My shifts</a>
+      <a href="/open-shifts">Find extra work</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (<%= user.role %>)</h2>
+      <p>
+        Upload your DBS, right-to-work and training certificates here.
+        Managers will review and mark them as verified.
+      </p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <section class="form-card">
+      <h3>Upload a document</h3>
+      <form method="POST" action="/profile-documents/upload" enctype="multipart/form-data">
+        <label>
+          Document type
+          <select name="doc_type" required>
+            <option value="">Select type</option>
+            <option value="dbs">DBS</option>
+            <option value="rtw">Right to work</option>
+            <option value="training">Training certificate</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          File
+          <input type="file" name="document_file" required />
+        </label>
+
+        <button type="submit" class="button">Upload</button>
+      </form>
+    </section>
+
+    <section>
+      <h3>Your documents</h3>
+      <% if (docs.length === 0) { %>
+        <p>You haven’t uploaded any documents yet.</p>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>File</th>
+              <th>Status</th>
+              <th>Uploaded</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% docs.forEach(d => { %>
+              <tr>
+                <td><%= d.doc_type %></td>
+                <td>
+                  <a href="<%= d.file_path %>" target="_blank">
+                    <%= d.original_name %>
+                  </a>
+                </td>
+                <td>
+                  <span class="status-pill status-<%= d.status %>">
+                    <%= d.status %>
+                  </span>
+                </td>
+                <td><%= d.uploaded_at %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

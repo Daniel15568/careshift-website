@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assign Shift - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Assign a Shift</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (Manager)</h2>
+      <p>Use this form to assign a shift to a worker (staff or nurse).</p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <% if (success) { %>
+      <div class="success"><%= success %></div>
+    <% } %>
+
+    <section class="form-card">
+      <% if (workers.length === 0) { %>
+        <p>
+          There are no workers yet. Ask your staff and nurses to register accounts
+          (selecting "staff" or "nurse" as their role).
+        </p>
+      <% } else { %>
+        <form method="POST" action="/assign-shift">
+          <label>
+            Worker
+            <select name="worker_id" required>
+              <option value="">Select a worker</option>
+              <% workers.forEach(w => { %>
+                <option value="<%= w.id %>">
+                  <%= w.name %> (<%= w.role %> - <%= w.email %>)
+                </option>
+              <% }) %>
+            </select>
+          </label>
+
+          <label>
+            Date
+            <input type="date" name="date" required />
+          </label>
+
+          <label>
+            Start time
+            <input type="time" name="start_time" required />
+          </label>
+
+          <label>
+            End time
+            <input type="time" name="end_time" required />
+          </label>
+
+                   <label>
+            Location / unit
+            <input type="text" name="location" placeholder="e.g. Nightingale ward" />
+          </label>
+
+          <label>
+            Role for this shift
+            <input type="text" name="role" placeholder="e.g. Nurse, Senior carer" />
+          </label>
+
+          <label>
+            Notes (optional)
+            <textarea name="notes" rows="3" placeholder="e.g. Handover at 19:45, agency induction required"></textarea>
+          </label>
+
+          <button type="submit" class="button">Assign shift</button>
+        </form>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CareShift AI Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Top blue bar -->
+  <header class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-title">CareShift AI Dashboard</div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <% if (user.role === 'manager') { %>
+    <% var provider = (providers && providers.length > 0) ? providers[0] : null; %>
+
+    <main class="dashboard-shell">
+      <!-- Welcome -->
+      <section class="dashboard-section">
+        <h1>Welcome, <%= user.name %> (manager)</h1>
+      </section>
+
+      <!-- Provider + Today row -->
+      <section class="dashboard-header-row">
+        <div class="dash-card dash-provider">
+          <h2>Your provider account</h2>
+
+          <% if (provider) { %>
+            <h3><%= provider.name %></h3>
+            <p><strong>Service type:</strong> <%= provider.service_type || 'Not set' %></p>
+            <p><strong>Locations:</strong> <%= provider.locations || 'Not set' %></p>
+            <p><strong>Roles &amp; skill mix:</strong> <%= provider.roles_skill_mix || 'Not set' %></p>
+          <% } else { %>
+            <p>You haven’t set up a provider account yet.</p>
+            <p>
+              <a class="button secondary" href="/provider/new">Create provider</a>
+            </p>
+          <% } %>
+        </div>
+
+        <div class="dash-card dash-today">
+          <h2>Today</h2>
+          <p class="muted">
+            Use these shortcuts to explore rota planning, open shifts and compliance.
+    
+          </p>
+          <ul class="dash-list">
+            <li>Plan a week with the rota view.</li>
+            <li>Review DBS, RTW and training documents.</li>
+            <li>Post open shifts and approve worker requests.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Quick actions -->
+      <section class="dashboard-section">
+        <h2>Quick actions</h2>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Plan rota</h3>
+            <p>
+              Choose a week, plan safe staffing levels and assign shifts to your workers.
+            </p>
+            <p>
+              <a class="button" href="/rota-week">View weekly rota</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Assign a shift</h3>
+            <p>
+              Manually assign a shift to a named worker for a specific date and time.
+            </p>
+            <p>
+              <a class="button secondary" href="/assign-shift">Assign a shift to a worker</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Compliance checks</h3>
+            <p>
+              Review worker documents (DBS, right-to-work and training) and mark them as
+              verified or rejected.
+            </p>
+            <p>
+              <a class="button secondary" href="/documents-review">Open compliance checks</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Post open shifts</h3>
+            <p>
+              Create open shifts that your staff can see and claim as extra work. Approve or
+              reject worker requests.
+            </p>
+            <p>
+              <a class="button secondary" href="/open-shifts/manage">Create &amp; manage open shifts</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Shift requests -->
+      <section class="dashboard-section">
+        <h2>Shift requests from workers</h2>
+        <% var reqs = shiftRequests || []; %>
+        <% if (reqs.length === 0) { %>
+          <p class="muted">No pending shift requests right now.</p>
+        <% } else { %>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Location</th>
+                  <th>Role</th>
+                  <th>Worker</th>
+                  <th>Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% reqs.forEach(function(r) { %>
+                  <tr>
+                    <td><%= r.date %></td>
+                    <td><%= r.start_time %> - <%= r.end_time %></td>
+                    <td><%= r.location || '-' %></td>
+                    <td><%= r.role || '-' %></td>
+                    <td>
+                      <%= r.worker_name %> (<%= r.worker_role %>)<br />
+                      <small><%= r.worker_email %></small>
+                    </td>
+                    <td><%= r.notes || '-' %></td>
+                    <td>
+                      <form method="POST" action="/open-shifts/approve" class="inline-form">
+                        <input type="hidden" name="open_shift_id" value="<%= r.id %>" />
+                        <button type="submit" class="small-button">Approve</button>
+                      </form>
+                      <form method="POST" action="/open-shifts/reject" class="inline-form">
+                        <input type="hidden" name="open_shift_id" value="<%= r.id %>" />
+                        <button type="submit" class="danger-button small-button">Reject</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </section>
+
+      <!-- Coming soon -->
+      <section class="dashboard-section">
+        <h2>Coming soon</h2>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Full rota planner</h3>
+            <p>
+              Week-by-week rota planner with AI suggestions to highlight under-staffed
+              shifts and suggest workers based on role and availability.
+            </p>
+            <p>
+              <a class="button secondary" href="/rota-week">Try the basic week view</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Compliance dashboard</h3>
+            <p>
+              Red / amber alerts for expiring DBS, right-to-work checks and mandatory
+              training, all in one place.
+            </p>
+            <p>
+              <a class="button secondary" href="/documents-review">
+                Open compliance checks
+              </a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Shift marketplace</h3>
+            <p>
+              Smarter matching between open shifts and workers, with approvals and a clear
+              audit trail for every booking.
+            </p>
+            <p>
+              <a class="button secondary" href="/open-shifts/manage">
+                Open shift marketplace (demo)
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  <% } else { %>
+    <!-- WORKER VIEW -->
+    <main class="dashboard-shell">
+      <section class="dashboard-section">
+        <h1>Welcome, <%= user.name %> (<%= user.role %>)</h1>
+      </section>
+
+      <section class="dashboard-section">
+        <div class="card-grid">
+          <div class="card">
+            <h3>My shifts</h3>
+            <p>
+              View your upcoming shifts, see details (time, place, unit) and confirm attendance.
+              In future, you’ll also be able to request swaps and mark shifts as completed.
+            </p>
+            <p>
+              <a class="button" href="/my-shifts">Go to My Shifts</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Find extra work</h3>
+            <p>
+              Browse open shifts posted by managers, filter by date and location, and request them.
+              Approved shifts will automatically move into "My shifts".
+            </p>
+            <p>
+              <a class="button secondary" href="/open-shifts">Find extra work</a>
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Profile &amp; documents</h3>
+            <p>
+              Upload DBS, right-to-work and training certificates. Managers will be able to
+              review and mark them as verified.
+            </p>
+            <p>
+              <a class="button secondary" href="/profile-documents">Manage my documents</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-section">
+        <h2>Next steps</h2>
+        <p>
+          This worker dashboard is the starting point. Later, we can build separate pages for:
+        </p>
+        <ul>
+          <li>"My shifts" list with filters and shift details.</li>
+          <li>"Open shifts" list connected to the marketplace module.</li>
+          <li>"Profile &amp; documents" with upload and verification status.</li>
+        </ul>
+      </section>
+    </main>
+  <% } %>
+
+  <footer class="site-footer">
+    <p>&copy; <%= new Date().getFullYear() %> CareShift AI</p>
+  </footer>
+</body>
+</html>

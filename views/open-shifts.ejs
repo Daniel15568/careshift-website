@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Find Extra Work - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Find Extra Work</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/my-shifts">My shifts</a>
+      <a href="/profile-documents">Profile &amp; documents</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Hello, <%= user.name %> (<%= user.role %>)</h2>
+      <p>Browse open shifts posted by managers and claim extra work.</p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <section>
+      <% if (openShifts.length === 0) { %>
+        <p>No open shifts are available right now.</p>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Role</th>
+              <th>Notes</th>
+              <th>Posted by</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% openShifts.forEach(s => { %>
+              <tr>
+                <td><%= s.date %></td>
+                <td><%= s.start_time %> - <%= s.end_time %></td>
+                <td><%= s.location || '-' %></td>
+                <td><%= s.role || '-' %></td>
+                <td><%= s.notes || '-' %></td>
+                <td><%= s.manager_name %></td>
+                <td>
+                  <form method="POST" action="/open-shifts/claim">
+                    <input type="hidden" name="open_shift_id" value="<%= s.id %>" />
+                    <button type="submit" class="button small-button">Claim shift</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>
