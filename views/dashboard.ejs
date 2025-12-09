@@ -32,21 +32,32 @@
 
       <!-- Provider + Today row -->
       <section class="dashboard-header-row">
-        <div class="dash-card dash-provider">
-          <h2>Your provider account</h2>
+               <div class="dash-card dash-today">
+          <h2>Today</h2>
 
-          <% if (provider) { %>
-            <h3><%= provider.name %></h3>
-            <p><strong>Service type:</strong> <%= provider.service_type || 'Not set' %></p>
-            <p><strong>Locations:</strong> <%= provider.locations || 'Not set' %></p>
-            <p><strong>Roles &amp; skill mix:</strong> <%= provider.roles_skill_mix || 'Not set' %></p>
-          <% } else { %>
-            <p>You haven’t set up a provider account yet.</p>
-            <p>
-              <a class="button secondary" href="/provider/new">Create provider</a>
-            </p>
-          <% } %>
+          <p class="muted">
+            Snapshot of your service activity right now.
+          </p>
+
+          <ul class="dash-list">
+            <li>
+              Pending shift requests:
+              <strong>
+                <%= managerToday ? managerToday.pendingRequestsCount : 0 %>
+              </strong>
+            </li>
+            <li>
+              Open shifts still unfilled:
+              <strong>
+                <%= managerToday ? managerToday.openShiftsOpenCount : 0 %>
+              </strong>
+            </li>
+            <li>
+              Use the quick actions below to post more open shifts or review requests.
+            </li>
+          </ul>
         </div>
+
 
         <div class="dash-card dash-today">
           <h2>Today</h2>
@@ -210,6 +221,29 @@
       <section class="dashboard-section">
         <h1>Welcome, <%= user.name %> (<%= user.role %>)</h1>
       </section>
+            <section class="dashboard-section">
+        <div class="dash-card">
+          <h2>Today</h2>
+
+          <% if (workerToday && workerToday.nextShift) { %>
+            <p>
+              Your <strong>next shift</strong> is on
+              <strong><%= workerToday.nextShift.date %></strong>,
+              from <strong><%= workerToday.nextShift.start_time %></strong>
+              to <strong><%= workerToday.nextShift.end_time %></strong>
+              at <strong><%= workerToday.nextShift.location || 'TBC' %></strong>.
+            </p>
+          <% } else { %>
+            <p>You don’t have any upcoming shifts scheduled yet.</p>
+          <% } %>
+
+          <p class="muted">
+            Upcoming shifts: <strong><%= workerToday ? workerToday.upcomingCount : 0 %></strong><br />
+            Pending open-shift requests: <strong><%= workerToday ? workerToday.pendingRequestsCount : 0 %></strong>
+          </p>
+        </div>
+      </section>
+
 
       <section class="dashboard-section">
         <div class="card-grid">

@@ -361,11 +361,14 @@ app.post('/login', (req, res) => {
 
 // Dashboard (protected)
 // Dashboard (protected)
+// Dashboard (protected)
 app.get('/dashboard', requireLogin, (req, res) => {
   const user = req.session.user;
+  const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-  // If manager: load provider + any requested open shifts
+  // MANAGER DASHBOARD
   if (user.role === 'manager') {
+    // Load provider(s) for this manager first
     db.all(
       'SELECT * FROM providers WHERE created_by_user_id = ? ORDER BY created_at DESC',
       [user.id],
@@ -376,149 +379,13 @@ app.get('/dashboard', requireLogin, (req, res) => {
             user,
             providers: [],
             shiftRequests: [],
+            managerToday: null,
+            workerToday: null,
             error: 'Could not load provider data.',
           });
         }
- // My Shifts page (protected) - worker view
-app.get('/my-shifts', requireLogin, (req, res) => {
-  const user = req.session.user;
 
-  // Only staff/nurse should see this page
-  if (!['staff', 'nurse'].includes(user.role)) {
-    return res.redirect('/dashboard');
-  }
-
-  db.all(
-    'SELECT * FROM shifts WHERE user_id = ? ORDER BY date, start_time',
-    [user.id],
-    (err, shifts) => {
-      if (err) {
-        console.error(err);
-        return res.render('my-shifts', {
-          user,
-          shifts: [],
-          error: 'Could not load shifts.',
-        });
-      }
-
-      res.render('my-shifts', {
-        user,
-        shifts,
-        error: null,
-      });
-    }
-  );
-});
-
-
-// Update shift status (worker) - POST
-// Update shift status (worker) - POST
-app.post('/my-shifts/update-status', requireLogin, (req, res) => {
-  const user = req.session.user;
-  const { shift_id, status } = req.body;
-
-  const allowedStatuses = ['assigned', 'completed', 'cancelled'];
-
-  if (!shift_id || !status || !allowedStatuses.includes(status)) {
-    return res.redirect('/my-shifts');
-  }
-
-  // First, load the shift to check ownership + current status and details
-  db.get(
-    `
-    SELECT
-      id,
-      user_id,
-      status,
-      date,
-      start_time,
-      end_time,
-      location,
-      role,
-      notes,
-      created_by_user_id
-    FROM shifts
-    WHERE id = ?
-    `,
-    [shift_id],
-    (err, shift) => {
-      if (err) {
-        console.error(err);
-        return res.redirect('/my-shifts');
-      }
-
-      // No such shift or not owned by this user
-      if (!shift || shift.user_id !== user.id) {
-        return res.redirect('/my-shifts');
-      }
-
-      // If already cancelled, do NOT allow further changes
-      if (shift.status === 'cancelled') {
-        return res.redirect('/my-shifts');
-      }
-
-      const newStatus = status;
-
-      const stmt = db.prepare(
-        'UPDATE shifts SET status = ? WHERE id = ? AND user_id = ?'
-      );
-
-      stmt.run(newStatus, shift_id, user.id, (err2) => {
-        if (err2) {
-          console.error(err2);
-          return res.redirect('/my-shifts');
-        }
-
-        // If worker cancelled the shift, create a new open shift
-        if (newStatus === 'cancelled') {
-          const createdBy =
-            shift.created_by_user_id && shift.created_by_user_id !== user.id
-              ? shift.created_by_user_id
-              : user.id;
-
-          const insertOpen = db.prepare(`
-            INSERT INTO open_shifts (
-              date,
-              start_time,
-              end_time,
-              location,
-              role,
-              notes,
-              status,
-              created_by_user_id,
-              assigned_user_id,
-              filled_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, NULL, NULL)
-          `);
-
-          insertOpen.run(
-            shift.date,
-            shift.start_time,
-            shift.end_time,
-            shift.location,
-            shift.role,
-            shift.notes,
-            createdBy,
-            (err3) => {
-              if (err3) {
-                console.error(err3);
-              }
-              // Back to My Shifts; other staff will now see it under "Find extra work"
-              return res.redirect('/my-shifts');
-            }
-          );
-        } else {
-          // For non-cancel changes, just go back
-          return res.redirect('/my-shifts');
-        }
-      });
-    }
-  );
-});
-
-
-
+        // Then load shift requests for open shifts this manager created
         const sqlRequests = `
           SELECT
             os.*,
@@ -539,29 +406,123 @@ app.post('/my-shifts/update-status', requireLogin, (req, res) => {
               user,
               providers,
               shiftRequests: [],
+              managerToday: null,
+              workerToday: null,
               error: 'Could not load shift requests.',
             });
           }
 
-          res.render('dashboard', {
-            user,
-            providers,
-            shiftRequests,
-            error: null,
+          // Count how many open shifts are still unfilled
+          const sqlOpenCount = `
+            SELECT COUNT(*) AS openCount
+            FROM open_shifts
+            WHERE created_by_user_id = ?
+              AND status = 'open'
+          `;
+
+          db.get(sqlOpenCount, [user.id], (err3, rowOpen) => {
+            if (err3) {
+              console.error(err3);
+            }
+
+            const openShiftsOpenCount = rowOpen ? rowOpen.openCount : 0;
+            const pendingRequestsCount = shiftRequests.length;
+
+            const managerToday = {
+              pendingRequestsCount,
+              openShiftsOpenCount,
+            };
+
+            return res.render('dashboard', {
+              user,
+              providers,
+              shiftRequests,
+              managerToday,
+              workerToday: null,
+              error: null,
+            });
           });
         });
       }
     );
+
+  // WORKER DASHBOARD
   } else {
-    // Worker (staff / nurse): we don't need providers or requests
-    res.render('dashboard', {
-      user,
-      providers: [],
-      shiftRequests: [],
-      error: null,
+    // Next upcoming shift for this worker
+    const nextShiftSql = `
+      SELECT *
+      FROM shifts
+      WHERE user_id = ?
+        AND date >= ?
+      ORDER BY date, start_time
+      LIMIT 1
+    `;
+
+    db.get(nextShiftSql, [user.id, todayStr], (err1, nextShift) => {
+      if (err1) {
+        console.error(err1);
+        return res.render('dashboard', {
+          user,
+          providers: [],
+          shiftRequests: [],
+          managerToday: null,
+          workerToday: null,
+          error: 'Could not load today data.',
+        });
+      }
+
+      const upcomingCountSql = `
+        SELECT COUNT(*) AS upcomingCount
+        FROM shifts
+        WHERE user_id = ?
+          AND date >= ?
+      `;
+
+      db.get(upcomingCountSql, [user.id, todayStr], (err2, rowUpcoming) => {
+        if (err2) {
+          console.error(err2);
+          return res.render('dashboard', {
+            user,
+            providers: [],
+            shiftRequests: [],
+            managerToday: null,
+            workerToday: null,
+            error: 'Could not load today data.',
+          });
+        }
+
+        const pendingRequestsSql = `
+          SELECT COUNT(*) AS pendingRequestsCount
+          FROM open_shifts
+          WHERE assigned_user_id = ?
+            AND status = 'requested'
+        `;
+
+        db.get(pendingRequestsSql, [user.id], (err3, rowReq) => {
+          if (err3) {
+            console.error(err3);
+          }
+
+          const workerToday = {
+            nextShift: nextShift || null,
+            upcomingCount: rowUpcoming ? rowUpcoming.upcomingCount : 0,
+            pendingRequestsCount: rowReq ? rowReq.pendingRequestsCount : 0,
+          };
+
+          return res.render('dashboard', {
+            user,
+            providers: [],
+            shiftRequests: [],
+            managerToday: null,
+            workerToday,
+            error: null,
+          });
+        });
+      });
     });
   }
 });
+
 
 // Update shift status (worker) - POST
 app.post('/my-shifts/update-status', requireLogin, (req, res) => {
