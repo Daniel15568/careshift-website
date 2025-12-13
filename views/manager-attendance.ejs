@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shift attendance - CareShift AI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page">
+
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <div class="logo">CareShift AI Dashboard</div>
+      <nav class="top-nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/open-shifts/manage">Open shifts</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <section class="dashboard-section">
+      <h1>Shift attendance</h1>
+      <p class="muted">
+        Review when your staff clocked in and out of their shifts, and any reasons
+        they gave for late clock-ins or unusual clock-outs.
+      </p>
+    </section>
+
+    <section class="dashboard-section">
+      <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <% if (!attendance || !attendance.length) { %>
+        <p>No attendance records yet.</p>
+      <% } else { %>
+        <div class="card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Worker</th>
+                <th>Date</th>
+                <th>Shift</th>
+                <th>Location</th>
+                <th>Clock in</th>
+                <th>Clock out</th>
+                <th>Reasons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% attendance.forEach(row => { %>
+                <tr>
+                  <td>
+                    <strong><%= row.worker_name %></strong><br />
+                    <span class="muted"><%= row.worker_email %></span>
+                  </td>
+                  <td><%= row.date %></td>
+                  <td>
+                    <%= row.start_time %> – <%= row.end_time %>
+                  </td>
+                  <td><%= row.location || 'TBC' %></td>
+                  <td>
+                    <% if (row.clock_in) { %>
+                      <%= new Date(row.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                    <% } else { %>
+                      <span class="muted">Not recorded</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (row.clock_out) { %>
+                      <%= new Date(row.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                    <% } else { %>
+                      <span class="muted">Not recorded</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (row.clock_in_reason) { %>
+                      <div><strong>Clock in:</strong> <%= row.clock_in_reason %></div>
+                    <% } %>
+                    <% if (row.clock_out_reason) { %>
+                      <div><strong>Clock out:</strong> <%= row.clock_out_reason %></div>
+                    <% } %>
+                    <% if (!row.clock_in_reason && !row.clock_out_reason) { %>
+                      <span class="muted">No reasons given</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+  </main>
+</body>
+</html>

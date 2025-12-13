@@ -90,5 +90,18 @@ db.serialize(() => {
     )
   `);
 });
+db.run(`
+  CREATE TABLE IF NOT EXISTS shift_attendance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    shift_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    clock_in TEXT,
+    clock_out TEXT,
+    clock_in_reason TEXT,
+    clock_out_reason TEXT,
+    FOREIGN KEY (shift_id) REFERENCES shifts(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )
+`);
 
 module.exports = db;

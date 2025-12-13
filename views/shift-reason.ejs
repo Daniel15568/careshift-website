@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shift reason</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="page">
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <div class="logo">CareShift AI</div>
+      <nav class="top-nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="card">
+      <h1>
+        <% if (action === 'clock-in') { %>
+          Reason for late clock in
+        <% } else { %>
+          Reason for early/late clock out
+        <% } %>
+      </h1>
+
+      <p>
+        Shift on <strong><%= shift.date %></strong>,
+        from <strong><%= shift.start_time %></strong> to
+        <strong><%= shift.end_time %></strong>.
+      </p>
+
+      <form method="POST" action="/shifts/<%= shift.id %>/<%= action %>">
+        <label for="reason">Please give a short reason (required):</label>
+        <textarea
+          id="reason"
+          name="reason"
+          rows="4"
+          required
+          style="width:100%;"
+        ></textarea>
+
+        <div style="margin-top:1rem;">
+          <button type="submit" class="btn-primary">Submit reason</button>
+          <a href="/my-shifts" class="btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
