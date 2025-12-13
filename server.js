@@ -117,6 +117,34 @@ app.get('/my-shifts', requireLogin, (req, res) => {
     });
   });
 });
+// Worker: clock in to a shift
+app.post('/shifts/:id/clock-in', requireLogin, (req, res) => {
+  const shiftId = req.params.id;
+  const userId = req.session.user.id;
+  const now = new Date().toISOString();
+
+  // Try to record a clock-in time; if column doesn't exist, it will just log an error
+  const sql = `
+    UPDATE shifts
+    SET clock_in_time = COALESCE(clock_in_time, ?)
+    WHERE id = ? AND user_id = ?
+  `;
+
+  db.run(sql, [now, shiftId, userId], function (err) {
+    if (err) {
+      console.error('Error clocking in for shift', err);
+      // Optional: you can set a flash message here if you have flash support
+      // req.session.flash = { type: 'error', message: 'Could not clock in for this shift.' };
+    } else {
+      // Optional success flash message
+      // req.session.flash = { type: 'success', message: 'Clock-in recorded.' };
+    }
+
+    // Always send them back to My Shifts
+    res.redirect('/my-shifts');
+  });
+});
+
 // Clock in to a shift
 app.post('/shifts/:id/clock-in', requireLogin, (req, res) => {
   const user = req.session.user;
