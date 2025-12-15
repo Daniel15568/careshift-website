@@ -896,3 +896,209 @@ body {
     margin-right: 0.75rem;
   }
 }
+.profile-summary-card {
+  display: flex;
+  gap: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.profile-photo img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 999px;
+  border: 3px solid #2563eb;
+}
+
+.profile-photo-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.profile-summary-right h2 {
+  margin: 0 0 0.5rem;
+}
+/* === Manager workers page === */
+
+.worker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.worker-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.worker-photo-wrapper {
+  flex: 0 0 auto;
+}
+
+.worker-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4f46e5; /* indigo */
+}
+
+.worker-photo-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.worker-meta h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.worker-role {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.worker-email {
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.worker-email a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.worker-email a:hover {
+  text-decoration: underline;
+}
+
+.worker-address {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.text-muted {
+  color: #9ca3af;
+}
+
+.error-banner {
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+/* Shared info cards row (manager + worker dashboards) */
+.manager-info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.info-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.info-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.info-card p {
+  margin-bottom: 0.75rem;
+}
+
+/* coloured top strip, like your other big cards */
+.card-accent {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  border-radius: 18px 18px 0 0;
+}
+
+.card-accent-blue {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+.card-accent-green {
+  background: linear-gradient(90deg, #22c55e, #10b981);
+}
+
+.card-accent-amber {
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+}
+
+/* subtle helper styles */
+.small-muted {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.table-wrapper {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.data-table th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+.btn-link {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}

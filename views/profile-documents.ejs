@@ -2,91 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Profile &amp; Documents - CareShiftAI</title>
+  <title>Profile &amp; documents – CareShiftAI</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header>
-    <h1>Profile &amp; Documents</h1>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/dashboard">Dashboard</a>
-      <a href="/my-shifts">My shifts</a>
-      <a href="/open-shifts">Find extra work</a>
-      <a href="/logout">Logout</a>
-    </nav>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <h1 class="site-title">CareShift AI Dashboard</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/open-shifts">Find extra work</a>
+        <a href="/profile-documents" class="active">Profile &amp; documents</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section>
-      <h2>Hello, <%= user.name %> (<%= user.role %>)</h2>
-      <p>
-        Upload your DBS, right-to-work and training certificates here.
-        Managers will review and mark them as verified.
-      </p>
-    </section>
+  <main class="page-container">
+    <h2>Profile &amp; documents</h2>
 
     <% if (error) { %>
-      <div class="error"><%= error %></div>
+      <div class="error-banner"><%= error %></div>
     <% } %>
 
-    <section class="form-card">
-      <h3>Upload a document</h3>
-      <form method="POST" action="/profile-documents/upload" enctype="multipart/form-data">
-        <label>
-          Document type
-          <select name="doc_type" required>
-            <option value="">Select type</option>
-            <option value="dbs">DBS</option>
-            <option value="rtw">Right to work</option>
-            <option value="training">Training certificate</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
+    <section class="layout-2col">
+      <!-- LEFT: Profile card -->
+      <div class="card profile-card">
+        <h3>Your profile</h3>
 
-        <label>
-          File
-          <input type="file" name="document_file" required />
-        </label>
+        <div class="profile-header">
+          <div class="profile-photo-wrapper">
+            <% if (user && user.profile_photo_path) { %>
+              <img
+                src="<%= user.profile_photo_path %>"
+                alt="Profile photo of <%= user.name %>"
+                class="profile-photo"
+              />
+            <% } else { %>
+              <div class="profile-photo placeholder">
+                <span><%= (user && user.name) ? user.name.charAt(0).toUpperCase() : '?' %></span>
+              </div>
+            <% } %>
+          </div>
 
-        <button type="submit" class="button">Upload</button>
-      </form>
-    </section>
+          <div class="profile-main">
+            <p class="profile-name"><%= user ? user.name : '' %></p>
+            <p class="profile-role">
+              <span class="tag"><%= user ? user.role : '' %></span>
+            </p>
+            <p class="profile-email"><%= user ? user.email : '' %></p>
+          </div>
+        </div>
 
-    <section>
-      <h3>Your documents</h3>
-      <% if (docs.length === 0) { %>
-        <p>You haven’t uploaded any documents yet.</p>
-      <% } else { %>
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>File</th>
-              <th>Status</th>
-              <th>Uploaded</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% docs.forEach(d => { %>
+        <div class="profile-section">
+          <h4>Home address</h4>
+          <% if (user && user.house_number && user.street_name && user.city && user.postcode) { %>
+            <p>
+              <%= user.house_number %> <%= user.street_name %><br />
+              <%= user.city %><br />
+              <%= user.postcode %>
+            </p>
+          <% } else { %>
+            <p class="hint">
+              Your address is not fully set yet. Please contact your manager to update it if required.
+            </p>
+          <% } %>
+        </div>
+
+        <div class="profile-section">
+          <h4>Profile photo</h4>
+          <p class="hint">
+            Your profile photo is uploaded during registration. If you need to change it,
+            speak to your manager or admin.
+          </p>
+        </div>
+      </div>
+
+      <!-- RIGHT: Documents list + upload -->
+      <div class="card">
+        <h3>Your compliance documents</h3>
+        <p class="hint">
+          Upload your DBS, right-to-work and training certificates. Managers will review and mark
+          them as verified or rejected.
+        </p>
+
+        <!-- Upload form -->
+        <form
+          method="POST"
+          action="/profile-documents/upload"
+          enctype="multipart/form-data"
+          class="form-inline"
+        >
+          <label>
+            Document type
+            <select name="doc_type" required>
+              <option value="">Select type…</option>
+              <option value="dbs">DBS</option>
+              <option value="rtw">Right to work</option>
+              <option value="training">Training certificate</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+
+          <label>
+            File
+            <input type="file" name="document_file" required />
+          </label>
+
+          <button type="submit" class="btn-primary">Upload</button>
+        </form>
+
+        <!-- Documents table -->
+        <% if (!docs || docs.length === 0) { %>
+          <p class="mt-md">You haven’t uploaded any documents yet.</p>
+        <% } else { %>
+          <table class="table mt-md">
+            <thead>
               <tr>
-                <td><%= d.doc_type %></td>
-                <td>
-                  <a href="<%= d.file_path %>" target="_blank">
-                    <%= d.original_name %>
-                  </a>
-                </td>
-                <td>
-                  <span class="status-pill status-<%= d.status %>">
-                    <%= d.status %>
-                  </span>
-                </td>
-                <td><%= d.uploaded_at %></td>
+                <th>Type</th>
+                <th>File</th>
+                <th>Status</th>
+                <th>Uploaded</th>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      <% } %>
+            </thead>
+            <tbody>
+              <% docs.forEach(doc => { %>
+                <tr>
+                  <td>
+                    <% if (doc.doc_type === 'dbs') { %>
+                      DBS
+                    <% } else if (doc.doc_type === 'rtw') { %>
+                      Right to work
+                    <% } else if (doc.doc_type === 'training') { %>
+                      Training
+                    <% } else { %>
+                      Other
+                    <% } %>
+                  </td>
+                  <td>
+                    <a href="<%= doc.file_path %>" target="_blank" rel="noopener">
+                      <%= doc.original_name %>
+                    </a>
+                  </td>
+                  <td>
+                    <% if (doc.status === 'verified') { %>
+                      <span class="tag tag-success">Verified</span>
+                    <% } else if (doc.status === 'rejected') { %>
+                      <span class="tag tag-danger">Rejected</span>
+                    <% } else { %>
+                      <span class="tag tag-warning">Pending</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <%= doc.uploaded_at ? doc.uploaded_at : '' %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
     </section>
   </main>
 

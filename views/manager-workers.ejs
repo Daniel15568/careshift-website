@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your team - CareShiftAI</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="site-brand">
+        <a href="/dashboard" class="logo-link">
+          CareShift AI Dashboard
+        </a>
+      </div>
+      <nav class="site-nav">
+        <a href="/dashboard">Home</a>
+        <a href="/manager/workers" class="active">Workers</a>
+        <a href="/open-shifts/manage">Open shifts</a>
+        <a href="/documents-review">Compliance</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-header-section">
+      <h1>Your team</h1>
+      <p>All staff and nurses registered in your service, with contact details and addresses.</p>
+    </section>
+
+    <% if (error) { %>
+      <div class="error-banner"><%= error %></div>
+    <% } %>
+
+    <% if (!workers || workers.length === 0) { %>
+      <p>No workers found yet.</p>
+    <% } else { %>
+      <section class="worker-grid">
+        <% workers.forEach(worker => { %>
+          <article class="worker-card">
+            <div class="worker-photo-wrapper">
+              <% if (worker.profile_photo_path) { %>
+                <img
+                  src="<%= worker.profile_photo_path %>"
+                  alt="Profile photo of <%= worker.name %>"
+                  class="worker-photo"
+                />
+              <% } else { %>
+                <div class="worker-photo-placeholder">
+                  <%=
+                    worker.name
+                      .split(' ')
+                      .map(part => part[0])
+                      .join('')
+                      .toUpperCase()
+                  %>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="worker-meta">
+              <h2><%= worker.name %></h2>
+              <div class="worker-role">
+                <%= worker.role === 'nurse' ? 'Nurse' : 'Support staff' %>
+              </div>
+              <div class="worker-email">
+                <a href="mailto:<%= worker.email %>"><%= worker.email %></a>
+              </div>
+
+              <div class="worker-address">
+                <strong>Address</strong><br />
+                <% if (worker.house_number || worker.street_name || worker.city || worker.postcode) { %>
+                  <%= worker.house_number || '' %>
+                  <%= worker.street_name || '' %><br />
+                  <%= worker.city || '' %><br />
+                  <%= worker.postcode || '' %>
+                <% } else { %>
+                  <span class="text-muted">No address on file</span>
+                <% } %>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      </section>
+    <% } %>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
+  </footer>
+</body>
+</html>

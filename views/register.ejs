@@ -2,82 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Register - CareShiftAI</title>
+  <title>Register – CareShiftAI</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <header>
-    <h1>Create your CareShift AI account</h1>
+    <h1>CareShift AI – Create an account</h1>
     <nav>
       <a href="/">Home</a>
       <a href="/login">Login</a>
     </nav>
   </header>
 
-  <main>
-    <section class="form-card">
+  <main class="auth-page">
+    <section class="card">
+      <h2>Register</h2>
+
       <% if (error) { %>
-        <div class="error"><%= error %></div>
+        <div class="error-banner"><%= error %></div>
       <% } %>
 
-      <form method="POST" action="/register">
-        <h2>Account details</h2>
+      <!-- Important: multipart for photo upload -->
+      <form method="POST" action="/register" enctype="multipart/form-data" class="form-grid">
+        <!-- Basic details -->
+        <div class="form-section">
+          <h3>Your details</h3>
 
-        <label>
-          Full Name
-          <input type="text" name="name" required />
-        </label>
+          <label>
+            Full name
+            <input type="text" name="name" required />
+          </label>
 
-        <label>
-          Email
-          <input type="email" name="email" required />
-        </label>
+          <label>
+            Email address
+            <input type="email" name="email" required />
+          </label>
 
-        <label>
-          Password
-          <input type="password" name="password" required minlength="6" />
-        </label>
+          <label>
+            Password
+            <input type="password" name="password" required />
+          </label>
+        </div>
 
-        <label>
-          Role
-          <select name="role" required>
-            <option value="">Select your role</option>
-            <option value="manager" <%= presetRole === 'manager' ? 'selected' : '' %>>Manager</option>
-            <option value="staff" <%= presetRole === 'staff' ? 'selected' : '' %>>Support worker / care staff</option>
-            <option value="nurse" <%= presetRole === 'nurse' ? 'selected' : '' %>>Nurse</option>
-          </select>
-        </label>
+        <!-- Role selection -->
+        <div class="form-section">
+          <h3>Account type</h3>
 
-        <hr />
+          <div class="role-options">
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="manager"
+                <%= presetRole === 'manager' ? 'checked' : '' %> required />
+              Manager (care provider / agency)
+            </label>
 
-        <h2>Provider details (for managers)</h2>
-        <p class="note">
-          If you are a <strong>manager</strong>, please fill in these details about your care home or agency.
-          If you are a worker, you can leave these blank.
-        </p>
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="staff"
+                <%= presetRole === 'staff' ? 'checked' : '' %> />
+              Staff / Support worker
+            </label>
 
-        <label>
-          Provider name (care home / agency)
-          <input type="text" name="provider_name" />
-        </label>
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="nurse"
+                <%= presetRole === 'nurse' ? 'checked' : '' %> />
+              Nurse
+            </label>
+          </div>
+        </div>
 
-        <label>
-          Service type
-          <input type="text" name="provider_service_type" placeholder="e.g. Nursing home, Domiciliary care" />
-        </label>
+        <!-- Manager: provider details -->
+        <div id="manager-fields" class="form-section" style="display:none;">
+          <h3>Provider details (for managers)</h3>
 
-        <label>
-          Locations / sites
-          <input type="text" name="provider_locations" placeholder="e.g. London, Essex" />
-        </label>
+          <label>
+            Provider name (care home / agency) *
+            <input type="text" name="provider_name" />
+          </label>
 
-        <label>
-          Roles &amp; skill mix
-          <textarea name="provider_roles_skill_mix" rows="3"
-            placeholder="e.g. Nurses, senior carers, support workers"></textarea>
-        </label>
+          <label>
+            Service type
+            <input type="text" name="provider_service_type" placeholder="e.g. Supported living, Nursing home" />
+          </label>
 
-        <button type="submit" class="button">Create Account</button>
+          <label>
+            Locations covered
+            <textarea name="provider_locations" rows="2" placeholder="e.g. Telford, Birmingham"></textarea>
+          </label>
+
+          <label>
+            Roles &amp; skill mix
+            <textarea name="provider_roles_skill_mix" rows="2" placeholder="e.g. Support workers, Team leads, RGNs"></textarea>
+          </label>
+        </div>
+
+        <!-- Worker: address + photo -->
+        <div id="worker-fields" class="form-section" style="display:none;">
+          <h3>Your address (staff / nurse)</h3>
+
+          <p class="hint">
+            We need your full address for rota planning and compliance. All fields are required for staff and nurses.
+          </p>
+
+          <div class="address-grid">
+            <label>
+              House number
+              <input type="text" name="house_number" id="house_number" />
+            </label>
+
+            <label>
+              Street name
+              <input type="text" name="street_name" id="street_name" />
+            </label>
+
+            <label>
+              City
+              <input type="text" name="city" id="city" />
+            </label>
+
+            <label>
+              Postcode
+              <input type="text" name="postcode" id="postcode" />
+            </label>
+          </div>
+
+          <h3>Profile photo</h3>
+          <p class="hint">
+            Upload a clear head-and-shoulders photo. This will show on your profile and rota.
+          </p>
+
+          <label>
+            Profile photo
+            <input type="file" name="profile_photo" id="profile_photo" accept="image/*" />
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Create account</button>
+          <a href="/login" class="btn-link">Already have an account? Log in</a>
+        </div>
       </form>
     </section>
   </main>
@@ -85,5 +155,53 @@
   <footer>
     <p>&copy; <%= new Date().getFullYear() %> CareShiftAI</p>
   </footer>
+
+  <script>
+    // Simple JS to toggle manager vs worker sections
+    function updateRoleFields() {
+      const roleInputs = document.querySelectorAll('input[name="role"]');
+      let selected = null;
+      roleInputs.forEach(r => { if (r.checked) selected = r.value; });
+
+      const managerFields = document.getElementById('manager-fields');
+      const workerFields  = document.getElementById('worker-fields');
+
+      const addrInputs = [
+        document.getElementById('house_number'),
+        document.getElementById('street_name'),
+        document.getElementById('city'),
+        document.getElementById('postcode'),
+        document.getElementById('profile_photo')
+      ];
+
+      if (selected === 'manager') {
+        managerFields.style.display = 'block';
+        workerFields.style.display  = 'none';
+
+        // Address + photo not required for manager (server also allows null)
+        addrInputs.forEach(i => { if (i) i.required = false; });
+      } else if (selected === 'staff' || selected === 'nurse') {
+        managerFields.style.display = 'none';
+        workerFields.style.display  = 'block';
+
+        // Make address + photo required for staff/nurse
+        addrInputs.forEach(i => { if (i) i.required = true; });
+      } else {
+        managerFields.style.display = 'none';
+        workerFields.style.display  = 'none';
+        addrInputs.forEach(i => { if (i) i.required = false; });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const roleInputs = document.querySelectorAll('input[name="role"]');
+      roleInputs.forEach(r => {
+        r.addEventListener('change', updateRoleFields);
+      });
+
+      // Run once on load based on presetRole from server
+      updateRoleFields();
+    });
+  </script>
 </body>
 </html>
